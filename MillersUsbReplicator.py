@@ -41,7 +41,7 @@ def discover_drives():
         bit_mask = 2 ** bitmask_index
         if bit_mask & logical_drives_bitmask:
             # The 65 + bitmask_index is an ASCII table hack. Upper case alphabet letters start at 65 in the ASCII table.
-            # therefore to convert the
+            # therefore to convert the bitmask_index to a uppercase letter we are just adding 65
             discovered_drive_letter = "%s:\\" % chr(65 + bitmask_index)
             # Notes from MSDN. The below function returns a value which specifies the type of drive, which can be one
             # of the following values.
