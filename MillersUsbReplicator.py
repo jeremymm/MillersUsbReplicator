@@ -71,13 +71,22 @@ def change_labels(drive_list, new_label):
 
 
 class CopyTreeDescription:
-    def __init__(self, source_directory, destination_directory):
+    def __init__(self, source_directory, destination_directory, delete_destination_directory_if_exists):
         self.source_directory = source_directory
         self.destination_directory = destination_directory
+        self.delete_destination_directory_if_exists = delete_destination_directory_if_exists
 
 
 # Wrapper function to be called by process.map for processing more than one copy in parallel
 def invoke_copy(copy_tree_description):
+    if os.path.exists(copy_tree_description.destination_directory) and \
+            copy_tree_description.delete_destination_directory_if_exists:
+        print("Deleting destination: \"" + copy_tree_description.destination_directory + "\".  It already exists." +
+              copy_tree_description.destination_directory + os.linesep)
+        shutil.rmtree(copy_tree_description.destination_directory)
+
+    print("Copying from: " + copy_tree_description.source_directory + " to: " +
+          copy_tree_description.destination_directory + os.linesep)
     shutil.copytree(copy_tree_description.source_directory, copy_tree_description.destination_directory)
 
 
@@ -92,6 +101,10 @@ if __name__ == "__main__":
                             default='',
                             help="Path that will be created on the removable drives if it does not exist.",
                             required=True)
+        parser.add_argument('--delete_destination_folder', '-ddf', dest='delete_destination_folder',
+                            default=False,
+                            help="This will delete the destination folder if it already exists.",
+                            required=False)
         parser.add_argument('--volume_label', '-vl', dest='volume_label',
                             default='',
                             help="New label of destination volume(s). The label must be less than 12 characters.")
@@ -115,6 +128,11 @@ if __name__ == "__main__":
 
         destination_folder = args.destination_folder
 
+        if args.delete_destination_folder:
+            delete_destination_if_exists = True
+        else:
+            delete_destination_if_exists = False
+
         if len(args.volume_label) < 12:
             volume_label = args.volume_label
         else:
@@ -133,7 +151,7 @@ if __name__ == "__main__":
             change_labels(removable_drives, volume_label)
 
         print("Copying directory: " + source_folder + " to removable drives: " + ', '.join(removable_drives))
-        copy_descriptions = [CopyTreeDescription(source_folder, os.path.join(drive_letter, destination_folder)) for
+        copy_descriptions = [CopyTreeDescription(source_folder, os.path.join(drive_letter, destination_folder), delete_destination_if_exists) for
                              drive_letter in removable_drives]
         they_are_sure = input("Are you sure [Y/n]: ")
 
