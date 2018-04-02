@@ -12,7 +12,7 @@ __license__ = "Fair use v0.9"
 __version__ = "0.0.1"
 __maintainer__ = "Jeremy Michael Miller"
 __email__ = "maybe_later@mst.dnsalias.net"
-__status__ = "beta, it works. Needs a verbosity setting and something to verbose about. Needs verification option"
+__status__ = "Beta, it works. Needs a verbosity setting and something to verbose about. Needs verification option"
 
 # Please note, I purposely over commented this program. The intended audience required such detail.
 
